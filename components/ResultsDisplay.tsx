@@ -32,6 +32,13 @@ const CopyableCell: React.FC<{ valueToCopy: string | number; children: React.Rea
     );
 };
 
+const renderCellContent = (value: number, prefix = '', suffix = '') => {
+    if (isNaN(value) || !isFinite(value)) {
+        return <span className="text-gray-500">N/A</span>;
+    }
+    return <span className="font-mono">{`${prefix}${value}${suffix}`}</span>;
+};
+
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, positionFileResults }) => {
     return (
@@ -56,8 +63,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
                                         <CopyableCell valueToCopy={results.highestProfit}><span className="font-mono">${results.highestProfit}</span></CopyableCell>
                                         <CopyableCell valueToCopy={results.lowestProfit}><span className="font-mono">${results.lowestProfit}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={results.totalFeeReturned}><span className="font-mono">${results.totalFeeReturned}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={results.totalGasFee}><span className="font-mono">${results.totalGasFee}</span></CopyableCell>
+                                        <CopyableCell valueToCopy={!isNaN(results.totalFeeReturned) ? results.totalFeeReturned : ''}>{renderCellContent(results.totalFeeReturned, '$')}</CopyableCell>
+                                        <CopyableCell valueToCopy={!isNaN(results.totalGasFee) ? results.totalGasFee : ''}>{renderCellContent(results.totalGasFee, '$')}</CopyableCell>
                                     </div>
                                 ))}
                             </div>
@@ -83,7 +90,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                                     <div key={fileName} className="grid grid-cols-[minmax(0,3fr)_repeat(2,minmax(0,2fr))] gap-x-4 px-4 py-3 text-sm items-center hover:bg-gray-700/30">
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
                                         <CopyableCell valueToCopy={results.dailyOutOfRangeCount}><span className="font-mono">{results.dailyOutOfRangeCount}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={results.avgPriceRangeLast30Days * 100}><span className="font-mono">{`${results.avgPriceRangeLast30Days * 100}%`}</span></CopyableCell>
+                                        <CopyableCell valueToCopy={!isNaN(results.avgPriceRangeLast30Days) ? results.avgPriceRangeLast30Days * 100 : ''}>{renderCellContent(results.avgPriceRangeLast30Days * 100, '', '%')}</CopyableCell>
                                     </div>
                                 ))}
                             </div>

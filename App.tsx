@@ -34,7 +34,17 @@ const App: React.FC = () => {
         const highestProfit = Math.max(...returns);
         const lowestProfit = Math.min(...returns);
 
-        const sortedByTime = [...data].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        // Filter for entries with valid timestamps to prevent "Invalid time value" errors
+        const dataWithValidTimestamps = data.filter(d => d.timestamp && !isNaN(new Date(d.timestamp as string | number).getTime()));
+
+        if (dataWithValidTimestamps.length === 0) {
+            // If no valid timestamps, we can't determine the latest entry for fees.
+            return { highestProfit, lowestProfit, totalFeeReturned: NaN, totalGasFee: NaN };
+        }
+
+        const sortedByTime = dataWithValidTimestamps.sort((a, b) => 
+            new Date(b.timestamp as string | number).getTime() - new Date(a.timestamp as string | number).getTime()
+        );
         const latestEntry = sortedByTime[0];
 
         const totalFeeReturned = latestEntry.accumulated_fee_earned;
@@ -50,15 +60,26 @@ const App: React.FC = () => {
         
         // Daily out-of-range count
         const outOfRangeCount = data.filter(d => d.trigger_reason === "Position out of range").length;
-        const uniqueDays = new Set(data.map(d => new Date(d.timestamp).toISOString().split('T')[0])).size;
+
+        // Filter for entries with valid timestamps to prevent "Invalid time value" errors
+        const dataWithValidTimestamps = data.filter(d => d.timestamp && !isNaN(new Date(d.timestamp as string | number).getTime()));
+        
+        const uniqueDays = new Set(dataWithValidTimestamps.map(d => new Date(d.timestamp as string | number).toISOString().split('T')[0])).size;
         const dailyOutOfRangeCount = uniqueDays > 0 ? outOfRangeCount / uniqueDays : 0;
 
         // Average price range (last 30 days)
-        const sortedByTime = [...data].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        const latestDate = sortedByTime.length > 0 ? new Date(sortedByTime[0].timestamp) : new Date();
+        if (dataWithValidTimestamps.length === 0) {
+            // If no valid timestamps, 30-day average can't be calculated.
+            return { dailyOutOfRangeCount, avgPriceRangeLast30Days: NaN };
+        }
+
+        const sortedByTime = [...dataWithValidTimestamps].sort((a, b) => 
+            new Date(b.timestamp as string | number).getTime() - new Date(a.timestamp as string | number).getTime()
+        );
+        const latestDate = new Date(sortedByTime[0].timestamp as string | number);
         const thirtyDaysAgo = new Date(latestDate.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-        const last30DaysData = data.filter(d => new Date(d.timestamp) >= thirtyDaysAgo);
+        const last30DaysData = dataWithValidTimestamps.filter(d => new Date(d.timestamp as string | number) >= thirtyDaysAgo);
         
         const openPositions = last30DaysData.filter(d => d.event_type === "OPEN");
         const sumOfWidths = openPositions.reduce((sum, d) => sum + d.position_width_percentage, 0);
