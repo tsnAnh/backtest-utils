@@ -1,0 +1,5 @@
+{
+  "name": "Backtest Horizon",
+  "description": "An application to upload and analyze financial data from CSV files for vaults and positions, calculating key performance metrics.",
+  "requestFramePermissions": []
+}
