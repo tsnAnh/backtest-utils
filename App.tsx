@@ -67,23 +67,16 @@ const App: React.FC = () => {
         const uniqueDays = new Set(dataWithValidTimestamps.map(d => new Date(d.timestamp as string | number).toISOString().split('T')[0])).size;
         const dailyOutOfRangeCount = uniqueDays > 0 ? outOfRangeCount / uniqueDays : 0;
 
-        // Average price range (last 30 days)
+        // Average price range
         if (dataWithValidTimestamps.length === 0) {
-            // If no valid timestamps, 30-day average can't be calculated.
             return { dailyOutOfRangeCount, avgPriceRangeLast30Days: NaN };
         }
-
-        const sortedByTime = [...dataWithValidTimestamps].sort((a, b) => 
-            new Date(b.timestamp as string | number).getTime() - new Date(a.timestamp as string | number).getTime()
-        );
-        const latestDate = new Date(sortedByTime[0].timestamp as string | number);
-        const thirtyDaysAgo = new Date(latestDate.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-        const last30DaysData = dataWithValidTimestamps.filter(d => new Date(d.timestamp as string | number) >= thirtyDaysAgo);
         
-        const openPositions = last30DaysData.filter(d => d.event_type === "OPEN");
+        const openPositions = dataWithValidTimestamps.filter(d => d.event_type === "OPEN");
         const sumOfWidths = openPositions.reduce((sum, d) => sum + d.position_width_percentage, 0);
         const countOfOpens = openPositions.length;
+        
+        // Corrected calculation to match: (SUMIF / COUNTIF) / 2
         const avgPriceRangeLast30Days = countOfOpens > 0 ? (sumOfWidths / countOfOpens) / 2 : 0;
         
         return { dailyOutOfRangeCount, avgPriceRangeLast30Days };

@@ -17,10 +17,17 @@ export function parseCSV<T>(csvText: string): T[] {
 
         const entry = {} as T;
         header.forEach((key, index) => {
-            const value = values[index].trim();
+            const originalValue = values[index]?.trim() || '';
+            
+            // Clean the value of common symbols before attempting numeric conversion
+            const cleanedValue = originalValue.replace(/[\$,%]/g, '');
+            
             // Attempt to convert to number if it looks like one, otherwise keep as string
-            const numValue = Number(value);
-            (entry as any)[key] = !isNaN(numValue) && value !== '' ? numValue : value;
+            if (cleanedValue !== '' && !isNaN(Number(cleanedValue))) {
+                 (entry as any)[key] = Number(cleanedValue);
+            } else {
+                 (entry as any)[key] = originalValue;
+            }
         });
         return entry;
     }).filter(entry => entry !== null) as T[];

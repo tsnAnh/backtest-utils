@@ -82,7 +82,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                             <div className="grid grid-cols-[minmax(0,3fr)_repeat(2,minmax(0,2fr))] gap-x-4 px-4 py-3 bg-gray-700/50 font-bold text-sm text-gray-300 text-left">
                                 <div className="truncate">File Name</div>
                                 <div className="truncate">Daily Out-of-Range Count</div>
-                                <div className="truncate">Avg. Price Range (30d)</div>
+                                <div className="truncate">Avg. Price Range</div>
                             </div>
                             {/* Body */}
                             <div className="divide-y divide-gray-700">
@@ -90,7 +90,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                                     <div key={fileName} className="grid grid-cols-[minmax(0,3fr)_repeat(2,minmax(0,2fr))] gap-x-4 px-4 py-3 text-sm items-center hover:bg-gray-700/30">
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
                                         <CopyableCell valueToCopy={results.dailyOutOfRangeCount}><span className="font-mono">{results.dailyOutOfRangeCount}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={!isNaN(results.avgPriceRangeLast30Days) ? results.avgPriceRangeLast30Days * 100 : ''}>{renderCellContent(results.avgPriceRangeLast30Days * 100, '', '%')}</CopyableCell>
+                                        <CopyableCell valueToCopy={!isNaN(results.avgPriceRangeLast30Days) ? results.avgPriceRangeLast30Days : ''}>{renderCellContent(results.avgPriceRangeLast30Days, '', '%')}</CopyableCell>
                                     </div>
                                 ))}
                             </div>
