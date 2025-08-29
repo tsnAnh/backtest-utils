@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { VaultFileResult, PositionFileResult } from '../types';
-import { CopyIcon, CheckIcon } from './Icons';
 
 interface ResultsDisplayProps {
     vaultFileResults: VaultFileResult[];
@@ -10,27 +9,41 @@ interface ResultsDisplayProps {
 const CopyableCell: React.FC<{ valueToCopy: string | number; children: React.ReactNode }> = ({ valueToCopy, children }) => {
     const [isCopied, setIsCopied] = useState(false);
 
-    const onCopy = (e: React.MouseEvent) => {
+    // Check if the value is not applicable (NaN or not a finite number)
+    const isNA = isNaN(Number(valueToCopy)) || !isFinite(Number(valueToCopy));
+
+    const handleCopy = (e: React.MouseEvent) => {
         e.stopPropagation();
+        if (isNA) return; // Don't copy if it's N/A
+
         navigator.clipboard.writeText(String(valueToCopy)).then(() => {
             setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
+            setTimeout(() => setIsCopied(false), 1500);
         }).catch(err => console.error('Failed to copy text: ', err));
     };
 
+    // Apply styles for feedback and interactivity
+    const cellClasses = [
+        'h-full',
+        'w-full',
+        'flex',
+        'items-center',
+        'transition-all',
+        'duration-300',
+        'rounded-md',
+        '-m-2', // negative margin to expand clickable area
+        'p-2', // padding to counteract negative margin
+        isNA ? 'cursor-default' : 'cursor-pointer',
+        isCopied ? 'bg-green-600/30' : (isNA ? '' : 'hover:bg-gray-700/50')
+    ].join(' ');
+
     return (
-        <div className="group relative flex items-center justify-start h-full">
+        <div onClick={handleCopy} className={cellClasses} title={isNA ? undefined : `Click to copy: ${valueToCopy}`}>
             <span className="truncate">{children}</span>
-            <button
-                onClick={onCopy}
-                className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-md bg-gray-900/50 text-gray-300 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-indigo-600 hover:text-white transition-all duration-200"
-                aria-label={`Copy value ${valueToCopy}`}
-            >
-                {isCopied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
-            </button>
         </div>
     );
 };
+
 
 const renderCellContent = (value: number, prefix = '', suffix = '') => {
     if (isNaN(value) || !isFinite(value)) {
@@ -59,12 +72,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                             {/* Body */}
                             <div className="divide-y divide-gray-700">
                                 {vaultFileResults.map(({ fileName, results }) => (
-                                    <div key={fileName} className="grid grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] gap-x-4 px-4 py-3 text-sm items-center hover:bg-gray-700/30">
+                                    <div key={fileName} className="grid grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] gap-x-4 px-4 py-3 text-sm items-center">
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
-                                        <CopyableCell valueToCopy={results.highestProfit}><span className="font-mono">${results.highestProfit}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={results.lowestProfit}><span className="font-mono">${results.lowestProfit}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={!isNaN(results.totalFeeReturned) ? results.totalFeeReturned : ''}>{renderCellContent(results.totalFeeReturned, '$')}</CopyableCell>
-                                        <CopyableCell valueToCopy={!isNaN(results.totalGasFee) ? results.totalGasFee : ''}>{renderCellContent(results.totalGasFee, '$')}</CopyableCell>
+                                        <td><CopyableCell valueToCopy={results.highestProfit}>{renderCellContent(results.highestProfit, '$')}</CopyableCell></td>
+                                        <td><CopyableCell valueToCopy={results.lowestProfit}>{renderCellContent(results.lowestProfit, '$')}</CopyableCell></td>
+                                        <td><CopyableCell valueToCopy={results.totalFeeReturned}>{renderCellContent(results.totalFeeReturned, '$')}</CopyableCell></td>
+                                        <td><CopyableCell valueToCopy={results.totalGasFee}>{renderCellContent(results.totalGasFee, '$')}</CopyableCell></td>
                                     </div>
                                 ))}
                             </div>
@@ -87,10 +100,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                             {/* Body */}
                             <div className="divide-y divide-gray-700">
                                 {positionFileResults.map(({ fileName, results }) => (
-                                    <div key={fileName} className="grid grid-cols-[minmax(0,3fr)_repeat(2,minmax(0,2fr))] gap-x-4 px-4 py-3 text-sm items-center hover:bg-gray-700/30">
+                                    <div key={fileName} className="grid grid-cols-[minmax(0,3fr)_repeat(2,minmax(0,2fr))] gap-x-4 px-4 py-3 text-sm items-center">
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
-                                        <CopyableCell valueToCopy={results.dailyOutOfRangeCount}><span className="font-mono">{results.dailyOutOfRangeCount}</span></CopyableCell>
-                                        <CopyableCell valueToCopy={!isNaN(results.avgPriceRangeLast30Days) ? results.avgPriceRangeLast30Days : ''}>{renderCellContent(results.avgPriceRangeLast30Days, '', '%')}</CopyableCell>
+                                        <td><CopyableCell valueToCopy={results.dailyOutOfRangeCount}>{renderCellContent(results.dailyOutOfRangeCount)}</CopyableCell></td>
+                                        <td><CopyableCell valueToCopy={results.avgPriceRangeLast30Days}>{renderCellContent(results.avgPriceRangeLast30Days, '', '%')}</CopyableCell></td>
                                     </div>
                                 ))}
                             </div>
