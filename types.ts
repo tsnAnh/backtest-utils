@@ -54,6 +54,7 @@ export interface VaultResults {
     lowestProfit: number;
     totalFeeReturned: number;
     totalGasFee: number;
+    finalTotalValueUSD: number;
 }
 
 export interface PositionResults {

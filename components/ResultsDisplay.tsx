@@ -62,22 +62,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ vaultFileResults, posit
                     <div className="bg-gray-800/50 rounded-lg border border-gray-700">
                         <div className="w-full">
                             {/* Header */}
-                            <div className="grid grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] gap-x-4 px-4 py-3 bg-gray-700/50 font-bold text-sm text-gray-300 text-left">
+                            <div className="grid grid-cols-[minmax(0,2fr)_repeat(5,minmax(0,1fr))] gap-x-4 px-4 py-3 bg-gray-700/50 font-bold text-sm text-gray-300 text-left">
                                 <div className="truncate">File Name</div>
                                 <div className="truncate">Highest Profit</div>
                                 <div className="truncate">Lowest Profit</div>
                                 <div className="truncate">Total Fee Returned</div>
                                 <div className="truncate">Total Gas Fee</div>
+                                <div className="truncate">Final Total Value</div>
                             </div>
                             {/* Body */}
                             <div className="divide-y divide-gray-700">
                                 {vaultFileResults.map(({ fileName, results }) => (
-                                    <div key={fileName} className="grid grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] gap-x-4 px-4 py-3 text-sm items-center">
+                                    <div key={fileName} className="grid grid-cols-[minmax(0,2fr)_repeat(5,minmax(0,1fr))] gap-x-4 px-4 py-3 text-sm items-center">
                                         <div className="truncate font-medium" title={fileName}>{fileName}</div>
                                         <td><CopyableCell valueToCopy={results.highestProfit}>{renderCellContent(results.highestProfit, '$')}</CopyableCell></td>
                                         <td><CopyableCell valueToCopy={results.lowestProfit}>{renderCellContent(results.lowestProfit, '$')}</CopyableCell></td>
                                         <td><CopyableCell valueToCopy={results.totalFeeReturned}>{renderCellContent(results.totalFeeReturned, '$')}</CopyableCell></td>
                                         <td><CopyableCell valueToCopy={results.totalGasFee}>{renderCellContent(results.totalGasFee, '$')}</CopyableCell></td>
+                                        <td><CopyableCell valueToCopy={results.finalTotalValueUSD}>{renderCellContent(results.finalTotalValueUSD, '$')}</CopyableCell></td>
                                     </div>
                                 ))}
                             </div>

@@ -39,7 +39,7 @@ const App: React.FC = () => {
 
         if (dataWithValidTimestamps.length === 0) {
             // If no valid timestamps, we can't determine the latest entry for fees.
-            return { highestProfit, lowestProfit, totalFeeReturned: NaN, totalGasFee: NaN };
+            return { highestProfit, lowestProfit, totalFeeReturned: NaN, totalGasFee: NaN, finalTotalValueUSD: NaN };
         }
 
         const sortedByTime = dataWithValidTimestamps.sort((a, b) => 
@@ -49,8 +49,9 @@ const App: React.FC = () => {
 
         const totalFeeReturned = latestEntry.accumulated_fee_earned;
         const totalGasFee = latestEntry.accumulated_gas_fee;
+        const finalTotalValueUSD = latestEntry.total_value_usd;
 
-        return { highestProfit, lowestProfit, totalFeeReturned, totalGasFee };
+        return { highestProfit, lowestProfit, totalFeeReturned, totalGasFee, finalTotalValueUSD };
     }, []);
 
     const calculatePositionMetrics = useCallback((data: PositionData[]): PositionResults | null => {
